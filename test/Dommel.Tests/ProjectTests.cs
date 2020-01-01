@@ -31,7 +31,7 @@ namespace Dommel.Tests
             Assert.Equal("select [Id], [Name], [DateUpdated] from [ProjectedFoos] order by [Id] offset 0 rows fetch next 5 rows only", sql);
         }
 
-        public class ProjectedFoo
+        private class ProjectedFoo
         {
             public int Id { get; set; }
 

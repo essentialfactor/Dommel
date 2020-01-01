@@ -40,5 +40,6 @@ namespace Dommel.Tests
                 .ToSql();
             Assert.Equal("select [Id], [Name] from [Products]", sql);
         }
+
     }
 }

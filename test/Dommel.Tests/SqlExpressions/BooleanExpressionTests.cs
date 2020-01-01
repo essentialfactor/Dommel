@@ -77,7 +77,7 @@ namespace Dommel.Tests
             Assert.Equal(" where ([Bar] = @p1 or [Baz] = '1')", sql);
         }
 
-        public class Foo
+        private class Foo
         {
             public string? Bar { get; set; }
 
