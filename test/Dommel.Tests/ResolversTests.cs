@@ -32,7 +32,7 @@ namespace Dommel.Tests
             Assert.Equal(typeof(Baz.BarChild).GetProperty("BarId"), foreignKeyB);
         }
 
-        public class Foo
+        private class Foo
         {
             [Table("BarA")]
             public class Bar
@@ -48,7 +48,7 @@ namespace Dommel.Tests
             }
         }
 
-        public class Baz
+        private class Baz
         {
             [Table("BarB")]
             public class Bar
