@@ -12,7 +12,6 @@ namespace Dommel.Tests
     public class SqlQueryTests
     {
         private readonly SqlQuery<Product> _sqlQuery = new SqlQuery<Product>(new SqlServerSqlBuilder());
-        private readonly SqlQueryTestClass<Product> _sqlQueryTestClass = new SqlQueryTestClass<Product>(new SqlServerSqlBuilder());
 
         [Fact]
         public void TranslateSelectExpression()
@@ -57,9 +56,42 @@ namespace Dommel.Tests
             AssertQueryMatches("SELECT [Products].[Id], [Categories].[Id], [Categories].[Name] FROM [Products] INNER JOIN [Categories] ON [Categories].[Id] = [Products].[CategoryId]", sql);
         }
 
-        // split on and keep the columns in the same order as the entities.
+        [Fact]
+        public void TranslateSimpleWhere()
+        {
+            var sql = _sqlQuery
+              .Select<Product>(p => new { p.Id, p.Name })
+              .Where(x => x.Name == "Test")
+              .ToSql(out var parameters);
+            var param = parameters.ParameterNames.First();
 
-        
+            Assert.Single(parameters.ParameterNames);
+            Assert.Equal("p1", param);
+            Assert.Equal("Test", parameters.Get<string>(param));
+            AssertQueryMatches("SELECT [Products].[Id], [Products].[Name] FROM [Products] WHERE [Products].[Name] = @p1", sql);
+        }
+
+        [Fact]
+        public void TranslateWhereClauseForJoined()
+        {
+            var sql = _sqlQuery
+              .InnerJoin<Category>((p, c) => p.CategoryId == c.Id)
+              .Select<Product>(p => new { p.Id, p.Name })
+              .Where(x => x.Name == "Test")
+              .Where<Category>(x => x.Id == 5)
+              .ToSql(out var parameters);
+            var param = parameters.ParameterNames.First();
+            var second = parameters.ParameterNames.Skip(1).First();
+
+            Assert.Equal(2, parameters.ParameterNames.Count());
+            Assert.Equal("p1", param);
+            Assert.Equal("Test", parameters.Get<string>(param));
+            Assert.Equal("p2", second);
+            Assert.Equal(5, parameters.Get<int>(second));
+            AssertQueryMatches("SELECT [Products].[Id], [Products].[Name] FROM [Products] INNER JOIN [Categories] ON [Products].[CategoryId] = [Categories].[Id] WHERE [Products].[Name] = @p1 AND [Categories].[Id] = @p2", sql);
+        }
+
+        // split on and keep the columns in the same order as the entities.
 
         private void AssertQueryMatches(string expected, string actual)
         {
@@ -69,21 +101,4 @@ namespace Dommel.Tests
         }
     }
 
-    public class SqlQueryTestClass<TEntity> : SqlQuery<TEntity> where TEntity : class
-    {
-        public SqlQueryTestClass(ISqlBuilder sqlBuilder) : base(sqlBuilder)
-        {
-
-        }
-
-        public object VisitExpressionTest(Expression expression)
-        {
-            return VisitExpression(expression);
-        }
-
-        public object ResolveJoin<TRelated>(Expression<Func<TEntity, TRelated, bool>> expression)
-        {
-            return VisitExpression(expression);
-        }
-    }
 }
