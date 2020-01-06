@@ -75,6 +75,17 @@ namespace Dommel
             return this;
         }
 
+        public virtual SqlQuery<TEntityType> Where<TEntity>(Expression<Func<TEntity, bool>> whereExpresion)
+        {
+            SqlBuilder.Where(VisitExpression(whereExpresion).ToString());
+            return this;
+        }
+
+        public virtual SqlQuery<TEntityType> Where(Expression<Func<TEntityType, bool>> whereExpression)
+        {
+            return Where<TEntityType>(whereExpression);
+        }
+
         private void AddColumn(Type type, string propertyName)
         {
             var propertyMaps = DommelMapper.Resolvers.Properties(type);
@@ -514,8 +525,14 @@ namespace Dommel
         public string ToSql()
         {
             return ToString();
-
         }
+
+        public string ToSql(out DynamicParameters dynamicParameters)
+        {
+            dynamicParameters = Parameters;
+            return ToString();
+        }
+
         /// <summary>
         /// An alias for AndWhere().
         /// </summary>
