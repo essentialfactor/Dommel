@@ -91,13 +91,34 @@ namespace Dommel.Tests
             AssertQueryMatches("SELECT [Products].[Id], [Products].[Name] FROM [Products] INNER JOIN [Categories] ON [Products].[CategoryId] = [Categories].[Id] WHERE [Products].[Name] = @p1 AND [Categories].[Id] = @p2", sql);
         }
 
+        [Fact]
+        public void ResolveCustomWhereExpression()
+        {
+            Expression<Func<Product, Category, bool>> selector = (p, c) => p.Name == "Test" && c.Id == 5;
+
+            var sql = _sqlQuery
+              .InnerJoin<Category>((p, c) => p.CategoryId == c.Id)
+              .Select<Product>(p => new { p.Id, p.Name })
+              .Where(selector)
+              .ToSql(out var parameters);
+            var param = parameters.ParameterNames.First();
+            var second = parameters.ParameterNames.Skip(1).First();
+
+            Assert.Equal(2, parameters.ParameterNames.Count());
+            Assert.Equal("p1", param);
+            Assert.Equal("Test", parameters.Get<string>(param));
+            Assert.Equal("p2", second);
+            Assert.Equal(5, parameters.Get<int>(second));
+            AssertQueryMatches("SELECT [Products].[Id], [Products].[Name] FROM [Products] INNER JOIN [Categories] ON [Products].[CategoryId] = [Categories].[Id] WHERE [Products].[Name] = @p1 AND [Categories].[Id] = @p2", sql);
+        }
+
         // split on and keep the columns in the same order as the entities.
 
         private void AssertQueryMatches(string expected, string actual)
         {
             var removeLineBreaks = System.Text.RegularExpressions.Regex.Replace(actual, @"\r\n?|\n", " ");
             removeLineBreaks = removeLineBreaks.Replace(" ,", ",");
-            Assert.Equal(expected, removeLineBreaks.Trim(), ignoreWhiteSpaceDifferences: true);
+            Assert.Equal(expected, removeLineBreaks.Trim(), ignoreWhiteSpaceDifferences: true, ignoreCase: true);
         }
     }
 
