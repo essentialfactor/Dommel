@@ -75,15 +75,25 @@ namespace Dommel
             return this;
         }
 
-        public virtual SqlQuery<TEntityType> Where<TEntity>(Expression<Func<TEntity, bool>> whereExpresion)
+        public virtual SqlQuery<TEntityType> Where<TEntity>(Expression<Func<TEntity, bool>> whereExpression)
         {
-            SqlBuilder.Where(VisitExpression(whereExpresion).ToString());
-            return this;
+            return Where(whereExpression as Expression);
         }
 
         public virtual SqlQuery<TEntityType> Where(Expression<Func<TEntityType, bool>> whereExpression)
         {
-            return Where<TEntityType>(whereExpression);
+            return Where(whereExpression as Expression);
+        }
+
+        /// <summary>
+        /// User supplied totally custom predicate expression.
+        /// </summary>
+        /// <param name="whereExpression"></param>
+        /// <returns></returns>
+        public virtual SqlQuery<TEntityType> Where(Expression whereExpression)
+        {
+            SqlBuilder.Where(VisitExpression(whereExpression).ToString());
+            return this;
         }
 
         private void AddColumn(Type type, string propertyName)
