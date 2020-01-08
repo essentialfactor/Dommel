@@ -13,8 +13,8 @@ namespace Dommel
        SqlQuery
        where TEntityType : class
     {
-        public SqlQuery(DommelMapper.ISqlBuilder sqlBuilder, string? alias = null, dynamic? parameters = null)
-            : base(sqlBuilder, alias == null ? DommelMapper.Resolvers.Table(typeof(TEntityType), sqlBuilder) : $"{DommelMapper.Resolvers.Table(typeof(TEntityType), sqlBuilder) } {alias}")
+        public SqlQuery(Dommel.ISqlBuilder sqlBuilder, string? alias = null, dynamic? parameters = null)
+            : base(sqlBuilder, alias == null ? Dommel.Resolvers.Table(typeof(TEntityType), sqlBuilder) : $"{Dommel.Resolvers.Table(typeof(TEntityType), sqlBuilder) } {alias}")
         {
             _types.Add(typeof(TEntityType));
         }
@@ -31,7 +31,7 @@ namespace Dommel
             _types.Add(type);
 
             var onSql = expression == null ? VisitExpression(ComputeJoinOnStatement(type)) : VisitExpression(expression).ToString();
-            SqlBuilder.InnerJoin($"{DommelMapper.Resolvers.Table(type, DommelSqlBuilder)} ON {onSql}");
+            SqlBuilder.InnerJoin($"{Dommel.Resolvers.Table(type, DommelSqlBuilder)} ON {onSql}");
             
             return this;
         }
@@ -41,8 +41,8 @@ namespace Dommel
             var type = typeof(TEntity);
             _types.Add(type);
 
-            var propertyMaps = DommelMapper.Resolvers.Properties(type);
-            var columns = propertyNames.Select(p => $"{DommelMapper.Resolvers.Table(type, DommelSqlBuilder)}.{DommelMapper.Resolvers.Column(propertyMaps.First(x => x.Name.Equals(p, StringComparison.OrdinalIgnoreCase)), DommelSqlBuilder)}");
+            var propertyMaps = Dommel.Resolvers.Properties(type);
+            var columns = propertyNames.Select(p => $"{Dommel.Resolvers.Table(type, DommelSqlBuilder)}.{Dommel.Resolvers.Column(propertyMaps.First(x => x.Name.Equals(p, StringComparison.OrdinalIgnoreCase)), DommelSqlBuilder)}");
             foreach (var propertyName in propertyNames)
             {
                 AddColumn(type, propertyName);
@@ -67,8 +67,12 @@ namespace Dommel
                 Expression.New(typeof(TEntity).GetConstructors()[0])).Compile();
             var obj = selector.Invoke(NewEntityFunc());
 
-            var props = DommelMapper.Resolvers.Properties(obj.GetType());
-            var columns = props.Select(p => $"{DommelMapper.Resolvers.Table(type, DommelSqlBuilder)}.{DommelMapper.Resolvers.Column(p, DommelSqlBuilder)}");
+            var props = obj.GetType().GetProperties();
+            if (props.Length == 0)
+            {
+                throw new ArgumentException($"Projection over type '{typeof(TEntity).Name}' yielded no properties.", nameof(selector));
+            }
+            var columns = props.Select(p => $"{Dommel.Resolvers.Table(type, DommelSqlBuilder)}.{Dommel.Resolvers.Column(p, DommelSqlBuilder)}");
 
             SqlBuilder.Select(string.Join(", ", columns));
 
@@ -98,10 +102,10 @@ namespace Dommel
 
         private void AddColumn(Type type, string propertyName)
         {
-            var propertyMaps = DommelMapper.Resolvers.Properties(type);
+            var propertyMaps = Dommel.Resolvers.Properties(type);
             var propertyInfo = propertyMaps.First(x => x.Name.Equals(propertyName, StringComparison.OrdinalIgnoreCase));
 
-            SqlBuilder.Select($"{DommelMapper.Resolvers.Table(type, DommelSqlBuilder)}.{DommelMapper.Resolvers.Column(propertyInfo, DommelSqlBuilder)}");
+            SqlBuilder.Select($"{Dommel.Resolvers.Table(type, DommelSqlBuilder)}.{Dommel.Resolvers.Column(propertyInfo, DommelSqlBuilder)}");
         }
     }
 
@@ -111,12 +115,12 @@ namespace Dommel
         protected List<Type> _types;
 
         public DynamicParameters Parameters { get; set; }
-        protected DommelMapper.ISqlBuilder DommelSqlBuilder { get; set; }
+        protected Dommel.ISqlBuilder DommelSqlBuilder { get; set; }
         protected Dapper.SqlBuilder SqlBuilder { get; set; }
         protected Dapper.SqlBuilder.Template QueryTemplate { get; set; }
         private int _parameterIndex;
 
-        public SqlQuery(DommelMapper.ISqlBuilder sqlBuilder, string from, dynamic? parameters = null)
+        public SqlQuery(Dommel.ISqlBuilder sqlBuilder, string from, dynamic? parameters = null)
         {
             _splitOn = new List<string>();
             _types = new List<Type>();
@@ -365,7 +369,7 @@ namespace Dommel
             Parameters.AddDynamicParams(parameters);
             if (join == null)
             {
-                join = $"{DommelMapper.Resolvers.Table(type, DommelSqlBuilder)} ON {VisitExpression(ComputeJoinOnStatement(type))}";
+                join = $"{Dommel.Resolvers.Table(type, DommelSqlBuilder)} ON {VisitExpression(ComputeJoinOnStatement(type))}";
             }
             SqlBuilder.InnerJoin(join);
             return this;
@@ -374,8 +378,8 @@ namespace Dommel
         protected Expression ComputeJoinOnStatement(Type type)
         {
             // ForeignKey single is all that is currently supported.
-            var foreignProp = DommelMapper.Resolvers.ForeignKeyProperty(_types.First(), type, out var relation);
-            var keyProps = DommelMapper.Resolvers.KeyProperties(type);
+            var foreignProp = Dommel.Resolvers.ForeignKeyProperty(_types.First(), type, out var relation);
+            var keyProps = Dommel.Resolvers.KeyProperties(type);
             if (keyProps.Length > 1)
             {
                 throw new InvalidOperationException($"Number of key columns of {type.Name} exceeds the number that is currently supported.  Composite keys not supported automatically.");
@@ -430,7 +434,7 @@ namespace Dommel
             Parameters.AddDynamicParams(parameters);
             if (join == null)
             {
-                join = $"{DommelMapper.Resolvers.Table(type, DommelSqlBuilder)} ON {VisitExpression(ComputeJoinOnStatement(type))}";
+                join = $"{Dommel.Resolvers.Table(type, DommelSqlBuilder)} ON {VisitExpression(ComputeJoinOnStatement(type))}";
             }
             SqlBuilder.LeftJoin(join);
             return this;
@@ -891,7 +895,7 @@ namespace Dommel
         /// <param name="expression">The member expression.</param>
         /// <returns>The result of the processing.</returns>
         protected virtual string MemberToColumn(MemberExpression expression) =>
-            $"{DommelMapper.Resolvers.Table(expression.Expression.Type, DommelSqlBuilder)}.{DommelMapper.Resolvers.Column((PropertyInfo)expression.Member, DommelSqlBuilder)}";
+            $"{Dommel.Resolvers.Table(expression.Expression.Type, DommelSqlBuilder)}.{Dommel.Resolvers.Column((PropertyInfo)expression.Member, DommelSqlBuilder)}";
 
         /// <summary>
         /// Returns the expression operant for the specified expression type.
