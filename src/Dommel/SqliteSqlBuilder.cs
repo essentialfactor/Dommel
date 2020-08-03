@@ -21,15 +21,15 @@ namespace Dommel
         }
 
         /// <inheritdoc/>
-        public string BuildUpdate(Type type, string tableName, PropertyInfo[] properties, KeyPropertyInfo[] keys)
+        public string BuildUpdate(Type type, string tableName, ColumnPropertyInfo[] properties, ColumnPropertyInfo[] keys)
         {
-            var columnNames = properties.Select(p => $"{Resolvers.Column(p, this)} = {PrefixParameter(p.Name)}").ToArray();
+            var columnNames = properties.Select(p => $"{Resolvers.Column(p.Property, this)} = {PrefixParameter(p.Property.Name)}").ToArray();
             var whereClauses = keys.Select(p => $"{Resolvers.Column(p.Property, this)} = {PrefixParameter(p.Property.Name)}");
             return $"update {tableName} set {string.Join(", ", columnNames)} where {string.Join(" and ", whereClauses)}";
         }
 
         /// <inheritdoc/>
-        public string BuildDelete(Type type, string tableName, KeyPropertyInfo[] keys)
+        public string BuildDelete(Type type, string tableName, ColumnPropertyInfo[] keys)
         {
             var whereClauses = keys.Select(p => $"{Resolvers.Column(p.Property, this)} = {PrefixParameter(p.Property.Name)}");
             return $"delete from {tableName} where {string.Join(" and ", whereClauses)}";

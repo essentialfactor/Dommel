@@ -42,7 +42,7 @@ namespace Dommel
             _types.Add(type);
 
             var propertyMaps = Dommel.Resolvers.Properties(type);
-            var columns = propertyNames.Select(p => $"{Dommel.Resolvers.Table(type, DommelSqlBuilder)}.{Dommel.Resolvers.Column(propertyMaps.First(x => x.Name.Equals(p, StringComparison.OrdinalIgnoreCase)), DommelSqlBuilder)}");
+            var columns = propertyNames.Select(p => $"{Dommel.Resolvers.Table(type, DommelSqlBuilder)}.{Dommel.Resolvers.Column(propertyMaps.First(x => x.Property.Name.Equals(p, StringComparison.OrdinalIgnoreCase)).Property, DommelSqlBuilder)}");
             foreach (var propertyName in propertyNames)
             {
                 AddColumn(type, propertyName);
@@ -103,7 +103,7 @@ namespace Dommel
         private void AddColumn(Type type, string propertyName)
         {
             var propertyMaps = Dommel.Resolvers.Properties(type);
-            var propertyInfo = propertyMaps.First(x => x.Name.Equals(propertyName, StringComparison.OrdinalIgnoreCase));
+            var propertyInfo = propertyMaps.First(x => x.Property.Name.Equals(propertyName, StringComparison.OrdinalIgnoreCase)).Property;
 
             SqlBuilder.Select($"{Dommel.Resolvers.Table(type, DommelSqlBuilder)}.{Dommel.Resolvers.Column(propertyInfo, DommelSqlBuilder)}");
         }

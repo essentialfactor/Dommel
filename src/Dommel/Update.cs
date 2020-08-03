@@ -52,8 +52,8 @@ namespace Dommel
                 var keyProperties = Resolvers.KeyProperties(type);
                 var typeProperties = Resolvers.Properties(type)
                     .Where(x => !x.IsGenerated)
-                    .Select(x => x.Property)
-                    .Except(keyProperties.Where(p => p.IsGenerated).Select(p => p.Property));
+                    .Except(keyProperties.Where(p => p.IsGenerated))
+                    .ToArray();
 
                 sql = sqlBuilder.BuildUpdate(type, tableName, typeProperties, keyProperties);
                 

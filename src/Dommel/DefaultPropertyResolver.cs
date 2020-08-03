@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace Dommel
@@ -33,7 +34,13 @@ namespace Dommel
                 includedProperties = includedProperties.Where(x => properties.Contains(x.Name, StringComparer.OrdinalIgnoreCase));
             }
 
-            return FilterComplexTypes(includedProperties).Where(p => p.GetSetMethod() is object && !p.IsDefined(typeof(IgnoreAttribute)));
+            foreach (var property in FilterComplexTypes(includedProperties))
+            {
+                if (!property.IsDefined(typeof(IgnoreAttribute)))
+                {
+                    yield return new ColumnPropertyInfo(property);
+                }
+            }
         }
 
         /// <summary>

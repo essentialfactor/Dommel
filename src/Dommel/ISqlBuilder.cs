@@ -56,7 +56,7 @@ namespace Dommel
         /// <param name="properties"></param>
         /// <param name="keys"></param>
         /// <returns></returns>
-        string BuildUpdate(Type type, string tableName, PropertyInfo[] properties, KeyPropertyInfo[] keys);
+        string BuildUpdate(Type type, string tableName, ColumnPropertyInfo[] properties, ColumnPropertyInfo[] keys);
 
         /// <summary>
         /// Builds delete query using the specified table name and key properties.
@@ -65,6 +65,6 @@ namespace Dommel
         /// <param name="tableName"></param>
         /// <param name="keys"></param>
         /// <returns></returns>
-        string BuildDelete(Type type, string tableName, KeyPropertyInfo[] keys);
+        string BuildDelete(Type type, string tableName, ColumnPropertyInfo[] keys);
     }
 }
