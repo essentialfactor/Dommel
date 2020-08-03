@@ -17,6 +17,6 @@ namespace Dommel
         /// <param name="properties">If provided only resolves to the properties whose property name matches the strings.</param>
         /// <param name="fullyQualified">Determines if the resolution should include the table name or not.</param>
         /// <returns>A collection of <see cref="PropertyInfo"/>'s of the <paramref name="type"/>.</returns>
-        IEnumerable<PropertyInfo> ResolveProperties(Type type, IEnumerable<string>? properties = default, bool fullyQualified = false);
+        IEnumerable<ColumnPropertyInfo> ResolveProperties(Type type, IEnumerable<string>? properties = default, bool fullyQualified = false);
     }
 }

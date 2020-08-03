@@ -1,5 +1,4 @@
 ﻿using Xunit;
-using static Dommel.DommelMapper;
 
 namespace Dommel.Tests
 {
@@ -16,11 +15,12 @@ namespace Dommel.Tests
         [InlineData(QueryCacheType.Update)]
         [InlineData(QueryCacheType.Delete)]
         [InlineData(QueryCacheType.DeleteAll)]
+        [InlineData(QueryCacheType.Any)]
         internal void SetsCache(QueryCacheType queryCacheType)
         {
             var cacheKey = new QueryCacheKey(queryCacheType, new DummySqlBuilder(), typeof(Foo));
-            QueryCache[cacheKey] = "blah";
-            Assert.Equal("blah", QueryCache[cacheKey]);
+            DommelMapper.QueryCache[cacheKey] = "blah";
+            Assert.Equal("blah", DommelMapper.QueryCache[cacheKey]);
         }
 
         [Fact]

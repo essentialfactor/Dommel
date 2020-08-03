@@ -40,32 +40,32 @@ echo "build: Calculating code coverage metrics"
 # Test coverage for Dommel
 
 # Create the first coverage in the coverlet JSON format to allow merging
-exec { & dotnet test test/Dommel.Tests -c Release -f netcoreapp3.1 --no-build /p:CollectCoverage=true }
+exec { & dotnet test test/Dommel.Tests -c Release --no-build /p:CollectCoverage=true }
 
 # Merge this coverage output with the previous coverage output, this time
 # create a report using the opencover format which codecov can parse
 Push-Location -Path "test/Dommel.IntegrationTests"
-exec { & dotnet test -c Release -f netcoreapp3.1 --no-build /p:CollectCoverage=true /p:MergeWith="..\Dommel.Tests\coverage.netcoreapp3.1.json" /p:CoverletOutputFormat=opencover }
+exec { & dotnet test -c Release --no-build /p:CollectCoverage=true /p:MergeWith="..\Dommel.Tests\coverage.json" /p:CoverletOutputFormat=opencover }
 if ($env:APPVEYOR_BUILD_NUMBER) {
-    exec { & codecov -f "coverage.netcoreapp3.1.opencover.xml" }
+    exec { & codecov -f "coverage.opencover.xml" }
 }
 Pop-Location
 
 #
 # Test coverage for Dommel.Json
-exec { & dotnet test test/Dommel.Json.Tests -c Release -f netcoreapp3.1 --no-build /p:CollectCoverage=true /p:Include="[Dommel.Json]*" }
+exec { & dotnet test test/Dommel.Json.Tests -c Release --no-build /p:CollectCoverage=true /p:Include="[Dommel.Json]*" }
 
 Push-Location -Path "test/Dommel.Json.IntegrationTests"
-exec { & dotnet test -c Release -f netcoreapp3.1 --no-build /p:CollectCoverage=true /p:Include="[Dommel.Json]*" /p:MergeWith="..\Dommel.Json.Tests\coverage.netcoreapp3.1.json" /p:CoverletOutputFormat=opencover }
+exec { & dotnet test -c Release --no-build /p:CollectCoverage=true /p:Include="[Dommel.Json]*" /p:MergeWith="..\Dommel.Json.Tests\coverage.json" /p:CoverletOutputFormat=opencover }
 if ($env:APPVEYOR_BUILD_NUMBER) {
-    exec { & codecov -f "coverage.netcoreapp3.1.opencover.xml" }
+    exec { & codecov -f "coverage.opencover.xml" }
 }
 Pop-Location
 
 #
-# Create artifcats
+# Create artifacts
 if ($env:APPVEYOR_BUILD_NUMBER) {
-    $versionSuffix = "{0:00000}" -f [convert]::ToInt32("0" + $env:APPVEYOR_BUILD_NUMBER, 10)
+    $versionSuffix = "beta8-{0:00000}" -f [convert]::ToInt32("0" + $env:APPVEYOR_BUILD_NUMBER, 10)
 }
 else {
     $versionSuffix = $suffix

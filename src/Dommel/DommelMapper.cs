@@ -15,7 +15,7 @@ namespace Dommel
     /// </summary>
     public static partial class DommelMapper
     {
-        private static readonly ConcurrentDictionary<string, PropertyInfo> ColumnNameCache = new ConcurrentDictionary<string, PropertyInfo>();
+        private static readonly ConcurrentDictionary<string, PropertyInfo?> ColumnNameCache = new ConcurrentDictionary<string, PropertyInfo?>();
 
         internal static ConcurrentDictionary<QueryCacheKey, string> QueryCache { get; } = new ConcurrentDictionary<QueryCacheKey, string>();
 
@@ -39,13 +39,18 @@ namespace Dommel
             // Type mapper for [Column] attribute
             SqlMapper.TypeMapProvider = type => CreateMap(type);
 
-            SqlMapper.ITypeMap CreateMap(Type t) => new CustomPropertyTypeMap(t,
+            static SqlMapper.ITypeMap CreateMap(Type t) => new CustomPropertyTypeMap(t,
                 (type, columnName) =>
                 {
                     var cacheKey = type + columnName;
                     if (!ColumnNameCache.TryGetValue(cacheKey, out var propertyInfo))
                     {
                         propertyInfo = type.GetProperties().FirstOrDefault(p => p.GetCustomAttribute<ColumnAttribute>()?.Name == columnName || p.Name == columnName);
+                        if (propertyInfo is null)
+                        {
+                            // Fallback to the default type mapping strategy of Dapper
+                            propertyInfo = new DefaultTypeMap(type).GetMember(columnName)?.Property;
+                        }
                         ColumnNameCache.TryAdd(cacheKey, propertyInfo);
                     }
 

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 
 namespace Dommel
@@ -11,21 +10,21 @@ namespace Dommel
     public class DefaultPropertyResolver : IPropertyResolver
     {
         private static readonly HashSet<Type> PrimitiveTypesSet = new HashSet<Type>
-            {
-                typeof(object),
-                typeof(string),
-                typeof(Guid),
-                typeof(decimal),
-                typeof(double),
-                typeof(float),
-                typeof(DateTime),
-                typeof(DateTimeOffset),
-                typeof(TimeSpan),
-                typeof(byte[])
-            };
+        {
+            typeof(object),
+            typeof(string),
+            typeof(Guid),
+            typeof(decimal),
+            typeof(double),
+            typeof(float),
+            typeof(DateTime),
+            typeof(DateTimeOffset),
+            typeof(TimeSpan),
+            typeof(byte[]),
+        };
 
         /// <inheritdoc/>
-        public virtual IEnumerable<PropertyInfo> ResolveProperties(Type type, IEnumerable<string>? properties = default, bool fullyQualified = false)
+        public virtual IEnumerable<ColumnPropertyInfo> ResolveProperties(Type type, IEnumerable<string>? properties = default, bool fullyQualified = false)
         {
             var includedProperties = type.GetRuntimeProperties();
 

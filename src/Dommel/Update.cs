@@ -47,13 +47,13 @@ namespace Dommel
             if (!QueryCache.TryGetValue(cacheKey, out var sql))
             {
                 var tableName = Resolvers.Table(type, sqlBuilder);
-                var keyProperties = Resolvers.KeyProperties(type);
 
-                // Use all properties which are settable.
+                // Use all non-key and non-generated properties for updates
+                var keyProperties = Resolvers.KeyProperties(type);
                 var typeProperties = Resolvers.Properties(type)
-                                              .Except(keyProperties.Where(p => p.IsGenerated).Select(p => p.Property))
-                                              .Where(p => p.GetSetMethod() != null)
-                                              .ToArray();
+                    .Where(x => !x.IsGenerated)
+                    .Select(x => x.Property)
+                    .Except(keyProperties.Where(p => p.IsGenerated).Select(p => p.Property));
 
                 sql = sqlBuilder.BuildUpdate(type, tableName, typeProperties, keyProperties);
                 

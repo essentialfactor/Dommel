@@ -42,6 +42,13 @@ namespace Dommel
         string QuoteIdentifier(string identifier);
 
         /// <summary>
+        /// Adds a limit clause to query.
+        /// </summary>
+        /// <param name="count">The count of limit clause.</param>
+        /// <returns>A limit clause of the specified count.</returns>
+        string LimitClause(int count);
+
+        /// <summary>
         /// Builds update query using the specified table name, properties (parameter names generated from properties) and key properties.
         /// </summary>
         /// <param name="type"></param>

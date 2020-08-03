@@ -9,14 +9,14 @@ namespace Dommel.Json.Tests
         public void LikeOperandContains_WithConstant()
         {
             // Arrange
-            var sqlExpression = new JsonSqlExpression<Lead>(new MySqlSqlBuilder());
+            var sqlExpression = new JsonSqlExpression<Lead>(new MySqlSqlBuilder(), new DommelJsonOptions());
 
             // Act
             var expression = sqlExpression.Where(p => p.Data.FirstName!.Contains("test"));
             var sql = expression.ToSql(out var dynamicParameters);
 
             // Assert
-            Assert.Equal("where (`Data`->'$.FirstName' like @p1)", sql.Trim());
+            Assert.Equal("where (lower(`Data`->'$.FirstName') like lower(@p1))", sql.Trim());
             Assert.Single(dynamicParameters.ParameterNames);
             Assert.Equal("%test%", dynamicParameters.Get<string>("p1"));
         }
@@ -25,7 +25,7 @@ namespace Dommel.Json.Tests
         public void LikeOperand_WithVariable()
         {
             // Arrange
-            var sqlExpression = new JsonSqlExpression<Lead>(new MySqlSqlBuilder());
+            var sqlExpression = new JsonSqlExpression<Lead>(new MySqlSqlBuilder(), new DommelJsonOptions());
             var substring = "test";
 
             // Act
@@ -33,7 +33,7 @@ namespace Dommel.Json.Tests
             var sql = expression.ToSql(out var dynamicParameters);
 
             // Assert
-            Assert.Equal("where (`Data`->'$.FirstName' like @p1)", sql.Trim());
+            Assert.Equal("where (lower(`Data`->'$.FirstName') like lower(@p1))", sql.Trim());
             Assert.Single(dynamicParameters.ParameterNames);
             Assert.Equal("%test%", dynamicParameters.Get<string>("p1"));
         }
@@ -42,14 +42,14 @@ namespace Dommel.Json.Tests
         public void LikeOperandStartsWith_WithConstant()
         {
             // Arrange
-            var sqlExpression = new JsonSqlExpression<Lead>(new MySqlSqlBuilder());
+            var sqlExpression = new JsonSqlExpression<Lead>(new MySqlSqlBuilder(), new DommelJsonOptions());
 
             // Act
             var expression = sqlExpression.Where(p => p.Data.FirstName!.StartsWith("test"));
             var sql = expression.ToSql(out var dynamicParameters);
 
             // Assert
-            Assert.Equal("where (`Data`->'$.FirstName' like @p1)", sql.Trim());
+            Assert.Equal("where (lower(`Data`->'$.FirstName') like lower(@p1))", sql.Trim());
             Assert.Single(dynamicParameters.ParameterNames);
             Assert.Equal("test%", dynamicParameters.Get<string>("p1"));
         }
@@ -58,7 +58,7 @@ namespace Dommel.Json.Tests
         public void LikeOperandStartsWith_WithVariable()
         {
             // Arrange
-            var sqlExpression = new JsonSqlExpression<Lead>(new MySqlSqlBuilder());
+            var sqlExpression = new JsonSqlExpression<Lead>(new MySqlSqlBuilder(), new DommelJsonOptions());
             var substring = "test";
 
             // Act
@@ -66,7 +66,7 @@ namespace Dommel.Json.Tests
             var sql = expression.ToSql(out var dynamicParameters);
 
             // Assert
-            Assert.Equal("where (`Data`->'$.FirstName' like @p1)", sql.Trim());
+            Assert.Equal("where (lower(`Data`->'$.FirstName') like lower(@p1))", sql.Trim());
             Assert.Single(dynamicParameters.ParameterNames);
             Assert.Equal("test%", dynamicParameters.Get<string>("p1"));
         }
@@ -75,14 +75,14 @@ namespace Dommel.Json.Tests
         public void LikeOperandEndsWith_WithConstant()
         {
             // Arrange
-            var sqlExpression = new JsonSqlExpression<Lead>(new MySqlSqlBuilder());
+            var sqlExpression = new JsonSqlExpression<Lead>(new MySqlSqlBuilder(), new DommelJsonOptions());
 
             // Act
             var expression = sqlExpression.Where(p => p.Data.FirstName!.EndsWith("test"));
             var sql = expression.ToSql(out var dynamicParameters);
 
             // Assert
-            Assert.Equal("where (`Data`->'$.FirstName' like @p1)", sql.Trim());
+            Assert.Equal("where (lower(`Data`->'$.FirstName') like lower(@p1))", sql.Trim());
             Assert.Single(dynamicParameters.ParameterNames);
             Assert.Equal("%test", dynamicParameters.Get<string>("p1"));
         }
@@ -91,7 +91,7 @@ namespace Dommel.Json.Tests
         public void LikeOperandEndsWith_WithVariable()
         {
             // Arrange
-            var sqlExpression = new JsonSqlExpression<Lead>(new MySqlSqlBuilder());
+            var sqlExpression = new JsonSqlExpression<Lead>(new MySqlSqlBuilder(), new DommelJsonOptions());
             var substring = "test";
 
             // Act
@@ -99,7 +99,7 @@ namespace Dommel.Json.Tests
             var sql = expression.ToSql(out var dynamicParameters);
 
             // Assert
-            Assert.Equal("where (`Data`->'$.FirstName' like @p1)", sql.Trim());
+            Assert.Equal("where (lower(`Data`->'$.FirstName') like lower(@p1))", sql.Trim());
             Assert.Single(dynamicParameters.ParameterNames);
             Assert.Equal("%test", dynamicParameters.Get<string>("p1"));
         }
