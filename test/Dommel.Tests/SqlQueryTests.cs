@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -25,10 +26,16 @@ namespace Dommel.Tests
         [Fact]
         public void MultipleSeparateProperties()
         {
+            var newTime = Stopwatch.StartNew();
             var sql = _sqlQuery
                 .Select<Product>(nameof(Product.Id))
                 .Select<Product>(p => new { p.Name })
                 .ToSql();
+            newTime.Stop();
+            var oldTime = Stopwatch.StartNew();
+            var oldSql = new SqlExpression<Product>(new SqlServerSqlBuilder()).ToSql();
+            oldTime.Stop();
+
             AssertQueryMatches("SELECT [Products].[Id], [Products].[Name] FROM [Products]", sql);
         }
 
@@ -59,10 +66,16 @@ namespace Dommel.Tests
         [Fact]
         public void TranslateSimpleWhere()
         {
+            var newTime = Stopwatch.StartNew();
             var sql = _sqlQuery
               .Select<Product>(p => new { p.Id, p.Name })
               .Where(x => x.Name == "Test")
               .ToSql(out var parameters);
+            newTime.Stop();
+            var oldTime = Stopwatch.StartNew();
+            var oldSql = new SqlExpression<Product>(new SqlServerSqlBuilder()).Where(x => x.Name == "Test").ToSql(out var parameters1);
+            oldTime.Stop();
+
             var param = parameters.ParameterNames.First();
 
             Assert.Single(parameters.ParameterNames);
