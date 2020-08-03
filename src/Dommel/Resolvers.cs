@@ -67,12 +67,13 @@ namespace Dommel
         /// <see cref="IPropertyResolver"/>.
         /// </summary>
         /// <param name="type">The <see cref="Type"/> to get the properties from.</param>
+        /// <param name="textProps"></param>
         /// <returns>>The collection of to be mapped properties of <paramref name="type"/>.</returns>
-        public static IEnumerable<ColumnPropertyInfo> Properties(Type type)
+        public static IEnumerable<ColumnPropertyInfo> Properties(Type type, IEnumerable<string>? textProps = default)
         {
             if (!TypePropertiesCache.TryGetValue(type, out var properties))
             {
-                properties = DommelMapper.PropertyResolver.ResolveProperties(type).ToArray();
+                properties = DommelMapper.PropertyResolver.ResolveProperties(type, textProps).ToArray();
                 TypePropertiesCache.TryAdd(type, properties);
             }
 

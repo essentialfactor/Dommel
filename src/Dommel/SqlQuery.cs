@@ -36,10 +36,13 @@ namespace Dommel
             return this;
         }
 
-        public virtual SqlQuery<TEntityType> Select<TEntity>(params string[] propertyNames)
+        public virtual SqlQuery<TEntityType> Select<TEntity>(IEnumerable<string> propertyNames)
         {
             var type = typeof(TEntity);
-            _types.Add(type);
+            if (!_types.Contains(type))
+            {
+                _types.Add(type);
+            }
 
             var propertyMaps = Dommel.Resolvers.Properties(type);
             var columns = propertyNames.Select(p => $"{Dommel.Resolvers.Table(type, DommelSqlBuilder)}.{Dommel.Resolvers.Column(propertyMaps.First(x => x.Property.Name.Equals(p, StringComparison.OrdinalIgnoreCase)).Property, DommelSqlBuilder)}");

@@ -28,7 +28,7 @@ namespace Dommel.Tests
         {
             var newTime = Stopwatch.StartNew();
             var sql = _sqlQuery
-                .Select<Product>(nameof(Product.Id))
+                .Select<Product>(new List<string> { nameof(Product.Id) })
                 .Select<Product>(p => new { p.Name })
                 .ToSql();
             newTime.Stop();
@@ -43,9 +43,9 @@ namespace Dommel.Tests
         public void CreateDefaultJoin()
         {
             var sql = _sqlQuery
-                .Select<Product>(nameof(Product.Id))
+                .Select<Product>(new List<string> { nameof(Product.Id) })
                 .InnerJoin<Category>()
-                .Select<Category>(nameof(Category.Id), nameof(Category.Name))
+                .Select<Category>(new List<string> { nameof(Category.Id), nameof(Category.Name) })
                 .SplitOn(nameof(Category.Id), typeof(Category))
                 .ToSql();
             AssertQueryMatches("SELECT [Products].[Id], [Categories].[Id], [Categories].[Name] FROM [Products] INNER JOIN [Categories] ON [Categories].[Id] = [Products].[CategoryId]", sql);
@@ -55,9 +55,9 @@ namespace Dommel.Tests
         public void ColumnNamesFromExpression()
         {
             var sql = _sqlQuery
-                .Select<Product>(nameof(Product.Id))
+                .Select<Product>(new List<string> { nameof(Product.Id) })
                 .InnerJoin<Category>((p, c) => c.Id == p.CategoryId)
-                .Select<Category>(nameof(Category.Id), nameof(Category.Name))
+                .Select<Category>(new List<string> { nameof(Category.Id), nameof(Category.Name) })
                 .SplitOn(nameof(Category.Id), typeof(Category))
                 .ToSql();
             AssertQueryMatches("SELECT [Products].[Id], [Categories].[Id], [Categories].[Name] FROM [Products] INNER JOIN [Categories] ON [Categories].[Id] = [Products].[CategoryId]", sql);
@@ -125,6 +125,16 @@ namespace Dommel.Tests
             Assert.Equal("p2", second);
             Assert.Equal(5, parameters.Get<int>(second));
             AssertQueryMatches("SELECT [Products].[Id], [Products].[Name] FROM [Products] INNER JOIN [Categories] ON [Products].[CategoryId] = [Categories].[Id] WHERE [Products].[Name] = @p1 AND [Categories].[Id] = @p2", sql);
+        }
+
+        [Fact]
+        public void SelectWithIEnumerable()
+        {
+            var sql = _sqlQuery
+                           .Select<Product>(new List<string> { nameof(Product.Id) , nameof(Product.Name)})
+                           .ToSql();
+            
+            AssertQueryMatches("SELECT [Products].[Id], [Products].[Name] FROM [Products]", sql);
         }
 
         // split on and keep the columns in the same order as the entities.

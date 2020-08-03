@@ -23,5 +23,15 @@ namespace Dommel.Tests
 
         /// <inheritdoc/>
         public string LimitClause(int count) => $"limit {count}";
+
+        public string BuildUpdate(Type type, string tableName, ColumnPropertyInfo[] properties, ColumnPropertyInfo[] keys)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string BuildDelete(Type type, string tableName, ColumnPropertyInfo[] keys)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
