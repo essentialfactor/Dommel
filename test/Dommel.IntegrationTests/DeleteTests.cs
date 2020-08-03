@@ -44,7 +44,7 @@ namespace Dommel.IntegrationTests
         public void DeleteAll(DatabaseDriver database)
         {
             using var con = database.GetConnection();
-            Assert.True(con.DeleteAll<Foo>());
+            Assert.True(con.DeleteAll<Foo>() > 0);
             Assert.Empty(con.GetAll<Foo>());
         }
 
@@ -53,7 +53,7 @@ namespace Dommel.IntegrationTests
         public async Task DeleteAllAsync(DatabaseDriver database)
         {
             using var con = database.GetConnection();
-            Assert.True(await con.DeleteAllAsync<Bar>());
+            Assert.True(await con.DeleteAllAsync<Bar>() > 0);
             Assert.Empty(await con.GetAllAsync<Bar>());
         }
 
@@ -92,7 +92,7 @@ namespace Dommel.IntegrationTests
 
             Assert.Equal(3, (await con.SelectAsync<Product>(p => p.Name == "blah")).Count());
 
-            con.DeleteMultiple<Product>(p => p.Name == "blah");
+            await con.DeleteMultipleAsync<Product>(p => p.Name == "blah");
         }
 
         [Theory]
@@ -130,7 +130,7 @@ namespace Dommel.IntegrationTests
 
             Assert.Equal(3, (await con.SelectAsync<Product>(p => p.Name == "blah")).Count());
 
-            con.DeleteMultiple<Product>(p => p.Name!.Contains("bla"));
+            await con.DeleteMultipleAsync<Product>(p => p.Name!.Contains("bla"));
         }
     }
 }

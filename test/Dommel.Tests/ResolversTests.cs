@@ -1,12 +1,18 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using Xunit;
-using static Dommel.DommelMapper;
 
 namespace Dommel.Tests
 {
     public class ResolversTests
     {
         private readonly ISqlBuilder _sqlBuilder = new SqlServerSqlBuilder();
+
+        [Fact]
+        public void Table_WithSchema()
+        {
+            Assert.Equal("[dbo].[Qux]", Resolvers.Table(typeof(FooQux), _sqlBuilder));
+            Assert.Equal("[foo].[dbo].[Qux]", Resolvers.Table(typeof(FooDboQux), _sqlBuilder));
+        }
 
         [Fact]
         public void Table_NoCacheConflictNestedClass()
@@ -30,6 +36,13 @@ namespace Dommel.Tests
 
             Assert.Equal(typeof(Foo.BarChild).GetProperty("BarId"), foreignKeyA);
             Assert.Equal(typeof(Baz.BarChild).GetProperty("BarId"), foreignKeyB);
+        }
+
+        [Fact]
+        public void KeyProperty()
+        {
+            var key = Assert.Single(Resolvers.KeyProperties(typeof(Product)));
+            Assert.Equal(typeof(Product).GetProperty("Id"), key.Property);
         }
 
         public class Foo
@@ -62,6 +75,18 @@ namespace Dommel.Tests
             {
                 public int BarId { get; set; }
             }
+        }
+
+        [Table("Qux", Schema = "foo.dbo")]
+        public class FooDboQux
+        {
+            public int Id { get; set; }
+        }
+
+        [Table("Qux", Schema = "dbo")]
+        public class FooQux
+        {
+            public int Id { get; set; }
         }
     }
 }

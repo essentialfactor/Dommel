@@ -47,7 +47,7 @@ namespace Dommel.Json
                 }
 
                 var sqlExpression = typeof(JsonSqlExpression<>).MakeGenericType(type);
-                return Activator.CreateInstance(sqlExpression, sqlBuilder);
+                return Activator.CreateInstance(sqlExpression, sqlBuilder, options);
             };
 
             // Add a Dapper type mapper with JSON support for
@@ -60,8 +60,8 @@ namespace Dommel.Json
                 {
                     foreach (var property in type.GetRuntimeProperties())
                     {
-                        var jsonAttr = property.GetCustomAttribute<JsonDataAttribute>();
-                        if (jsonAttr != null)
+                        var jsonDataAttr = property.GetCustomAttribute(options.JsonDataAttributeType);
+                        if (jsonDataAttr != null)
                         {
                             SqlMapper.AddTypeHandler(property.PropertyType, jsonTypeHander);
                             jsonTypes.Add(property.PropertyType);

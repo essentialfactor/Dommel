@@ -15,7 +15,7 @@ namespace Dommel.Tests
             var type = typeof(Foo);
 
             // Act
-            var props = resolver.ResolveProperties(type).ToArray();
+            var props = resolver.ResolveProperties(type).Select(x => x.Property);
 
             // Assert
             Assert.Collection(props,
@@ -28,19 +28,21 @@ namespace Dommel.Tests
                 x => Assert.Equal(x, type.GetProperty("DateTime")),
                 x => Assert.Equal(x, type.GetProperty("DateTimeOffset")),
                 x => Assert.Equal(x, type.GetProperty("Timespan")),
-                x => Assert.Equal(x, type.GetProperty("Bytes"))
+                x => Assert.Equal(x, type.GetProperty("Bytes")),
+                x => Assert.Equal(x, type.GetProperty("ReadonlyProp")),
+                x => Assert.Equal(x, type.GetProperty("PrivateSetterProp"))
             );
         }
 
         [Fact]
-        public void Resolves_WithCustom()
+        public void Resolves_WithCustomResolver()
         {
             // Arrange
             var resolver = new CustomResolver();
             var type = typeof(Foo);
 
             // Act
-            var props = resolver.ResolveProperties(type).ToArray();
+            var props = resolver.ResolveProperties(type).Select(x => x.Property);
 
             // Assert
             Assert.Collection(props,
@@ -52,7 +54,9 @@ namespace Dommel.Tests
                 x => Assert.Equal(x, type.GetProperty("DateTime")),
                 x => Assert.Equal(x, type.GetProperty("DateTimeOffset")),
                 x => Assert.Equal(x, type.GetProperty("Timespan")),
-                x => Assert.Equal(x, type.GetProperty("Bytes"))
+                x => Assert.Equal(x, type.GetProperty("Bytes")),
+                x => Assert.Equal(x, type.GetProperty("ReadonlyProp")),
+                x => Assert.Equal(x, type.GetProperty("PrivateSetterProp"))
             );
         }
 
@@ -64,7 +68,7 @@ namespace Dommel.Tests
             var type = typeof(Bar);
 
             // Act
-            var props = resolver.ResolveProperties(type).ToArray();
+            var props = resolver.ResolveProperties(type).Select(x => x.Property);
 
             // Assert
             var prop = Assert.Single(props);
