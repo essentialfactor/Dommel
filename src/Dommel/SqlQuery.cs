@@ -568,6 +568,8 @@ namespace Dommel
             }
         }
 
+        #region Expression Tree methods
+
         /// <summary>
         /// Visits the expression.
         /// </summary>
@@ -932,5 +934,7 @@ namespace Dommel
             paramName = DommelSqlBuilder.PrefixParameter($"p{_parameterIndex}");
             Parameters.Add(paramName, value: value);
         }
+
+        #endregion
     }
 }

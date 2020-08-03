@@ -24,13 +24,18 @@ namespace Dommel
                 typeof(byte[])
             };
 
-        /// <summary>
-        /// Resolves the properties to be mapped for the specified type.
-        /// </summary>
-        /// <param name="type">The type to resolve the properties to be mapped for.</param>
-        /// <returns>A collection of <see cref="PropertyInfo"/>'s of the <paramref name="type"/>.</returns>
-        public virtual IEnumerable<PropertyInfo> ResolveProperties(Type type) =>
-            FilterComplexTypes(type.GetRuntimeProperties()).Where(p => p.GetSetMethod() is object && !p.IsDefined(typeof(IgnoreAttribute)));
+        /// <inheritdoc/>
+        public virtual IEnumerable<PropertyInfo> ResolveProperties(Type type, IEnumerable<string>? properties = default, bool fullyQualified = false)
+        {
+            var includedProperties = type.GetRuntimeProperties();
+
+            if (properties != default)
+            {
+                includedProperties = includedProperties.Where(x => properties.Contains(x.Name, StringComparer.OrdinalIgnoreCase));
+            }
+
+            return FilterComplexTypes(includedProperties).Where(p => p.GetSetMethod() is object && !p.IsDefined(typeof(IgnoreAttribute)));
+        }
 
         /// <summary>
         /// Gets a collection of types that are considered 'primitive' for Dommel but are not for the CLR.

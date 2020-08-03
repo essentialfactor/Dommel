@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 
 namespace Dommel
 {
@@ -39,5 +40,24 @@ namespace Dommel
         /// <param name="identifier">The identifier add quotes around. E.g. a table or column name.</param>
         /// <returns>The quoted <paramref name="identifier"/>.</returns>
         string QuoteIdentifier(string identifier);
+
+        /// <summary>
+        /// Builds update query using the specified table name, properties (parameter names generated from properties) and key properties.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="tableName"></param>
+        /// <param name="properties"></param>
+        /// <param name="keys"></param>
+        /// <returns></returns>
+        string BuildUpdate(Type type, string tableName, PropertyInfo[] properties, KeyPropertyInfo[] keys);
+
+        /// <summary>
+        /// Builds delete query using the specified table name and key properties.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="tableName"></param>
+        /// <param name="keys"></param>
+        /// <returns></returns>
+        string BuildDelete(Type type, string tableName, KeyPropertyInfo[] keys);
     }
 }

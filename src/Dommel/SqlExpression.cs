@@ -28,6 +28,7 @@ namespace Dommel
         /// class using the specified <see cref="ISqlBuilder"/>.
         /// </summary>
         /// <param name="sqlBuilder">The <see cref="ISqlBuilder"/> instance.</param>
+        [Obsolete("Replaced with SqlQuery")]
         public SqlExpression(ISqlBuilder sqlBuilder)
         {
             SqlBuilder = sqlBuilder;

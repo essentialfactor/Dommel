@@ -55,10 +55,8 @@ namespace Dommel
                                               .Where(p => p.GetSetMethod() != null)
                                               .ToArray();
 
-                var columnNames = typeProperties.Select(p => $"{Resolvers.Column(p, sqlBuilder)} = {sqlBuilder.PrefixParameter(p.Name)}").ToArray();
-                var whereClauses = keyProperties.Select(p => $"{Resolvers.Column(p.Property, sqlBuilder)} = {sqlBuilder.PrefixParameter(p.Property.Name)}");
-                sql = $"update {tableName} set {string.Join(", ", columnNames)} where {string.Join(" and ", whereClauses)}";
-
+                sql = sqlBuilder.BuildUpdate(type, tableName, typeProperties, keyProperties);
+                
                 QueryCache.TryAdd(cacheKey, sql);
             }
 

@@ -87,12 +87,14 @@ namespace Dommel.Tests
         [Fact]
         public void TranslateWhereClauseForJoined()
         {
+            var translateTime = Stopwatch.StartNew();
             var sql = _sqlQuery
               .InnerJoin<Category>((p, c) => p.CategoryId == c.Id)
               .Select<Product>(p => new { p.Id, p.Name })
               .Where(x => x.Name == "Test")
               .Where<Category>(x => x.Id == 5)
               .ToSql(out var parameters);
+            translateTime.Stop();
             var param = parameters.ParameterNames.First();
             var second = parameters.ParameterNames.Skip(1).First();
 
