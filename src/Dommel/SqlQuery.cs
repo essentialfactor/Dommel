@@ -50,6 +50,8 @@ namespace Dommel
             {
                 AddColumn(type, propertyName);
             }
+
+
             return this;
         }
 
@@ -75,7 +77,8 @@ namespace Dommel
             {
                 throw new ArgumentException($"Projection over type '{typeof(TEntity).Name}' yielded no properties.", nameof(selector));
             }
-            var columns = props.Select(p => $"{Dommel.Resolvers.Table(type, DommelSqlBuilder)}.{Dommel.Resolvers.Column(p, DommelSqlBuilder)}");
+            var allProperties = Resolvers.Properties(type).Select(x => x.Property.Name);
+            var columns = props.Where(x => allProperties.Contains(x.Name, StringComparer.OrdinalIgnoreCase)).Select(p => $"{Dommel.Resolvers.Table(type, DommelSqlBuilder)}.{Dommel.Resolvers.Column(p, DommelSqlBuilder)}");
 
             SqlBuilder.Select(string.Join(", ", columns));
 
@@ -523,8 +526,8 @@ namespace Dommel
         public SqlQuery SplitOn(string columnName, Type entityType)
         {
             // RemoveSingleTableQueryItems();
-
-            _splitOn.Add(columnName);
+            var column = Resolvers.Column(entityType.GetProperty(columnName), DommelSqlBuilder);
+            _splitOn.Add(column);
             _types.Add(entityType);
 
             return this;
@@ -547,6 +550,19 @@ namespace Dommel
         public string ToSql(out DynamicParameters dynamicParameters)
         {
             dynamicParameters = Parameters;
+            return ToString();
+        }
+
+        /// <summary>
+        /// Not yet ready to reliabily return splitOn parameter
+        /// </summary>
+        /// <param name="dynamicParameters"></param>
+        /// <param name="splitOn"></param>
+        /// <returns></returns>
+        public string ToSql(out DynamicParameters dynamicParameters, out string splitOn)
+        {
+            dynamicParameters = Parameters;
+            splitOn = string.Join(", ", _splitOn);
             return ToString();
         }
 

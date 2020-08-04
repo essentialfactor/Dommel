@@ -137,6 +137,16 @@ namespace Dommel.Tests
             AssertQueryMatches("SELECT [Products].[Id], [Products].[Name] FROM [Products]", sql);
         }
 
+        [Fact]
+        public void SelectAllProperties()
+        {
+            var sql = _sqlQuery
+                          .Select<Product>(p => p)
+                          .ToSql();
+
+            AssertQueryMatches("SELECT [Products].[Id], [Products].[Name], [Products].[CategoryId] FROM [Products]", sql);
+        }
+
         // split on and keep the columns in the same order as the entities.
 
         private void AssertQueryMatches(string expected, string actual)
