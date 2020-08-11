@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 using Xunit;
 using static Dommel.DommelMapper;
 
@@ -66,10 +67,14 @@ namespace Dommel.Tests
         [Fact]
         public void TranslateSimpleWhere()
         {
+            var predicate = PredicateBuilder.True<Product>();
+            predicate = predicate.And(p => p.Name == "Test");
+
+
             var newTime = Stopwatch.StartNew();
             var sql = _sqlQuery
               .Select<Product>(p => new { p.Id, p.Name })
-              .Where(x => x.Name == "Test")
+              .Where(predicate)
               .ToSql(out var parameters);
             newTime.Stop();
             var oldTime = Stopwatch.StartNew();
@@ -81,7 +86,7 @@ namespace Dommel.Tests
             Assert.Single(parameters.ParameterNames);
             Assert.Equal("p1", param);
             Assert.Equal("Test", parameters.Get<string>(param));
-            AssertQueryMatches("SELECT [Products].[Id], [Products].[Name] FROM [Products] WHERE [Products].[Name] = @p1", sql);
+            AssertQueryMatches("SELECT [Products].[Id], [Products].[Name] FROM [Products] WHERE 1 = 1 and [Products].[Name] = @p1", sql);
         }
 
         [Fact]

@@ -380,7 +380,7 @@ namespace Dommel
             SqlBuilder.InnerJoin(join);
             return this;
         }
-        
+
         protected Expression ComputeJoinOnStatement(Type type)
         {
             // ForeignKey single is all that is currently supported.
@@ -391,10 +391,10 @@ namespace Dommel
                 throw new InvalidOperationException($"Number of key columns of {type.Name} exceeds the number that is currently supported.  Composite keys not supported automatically.");
             }
             var idProp = keyProps.FirstOrDefault();
-            
+
             var rightParam = Expression.Parameter(_types.First(), _types.First().Name);
             var rightSide = Expression.MakeMemberAccess(rightParam, foreignProp);
-            
+
             var leftParam = Expression.Parameter(type, type.Name);
             var leftSide = Expression.MakeMemberAccess(leftParam, idProp.Property);
 
@@ -597,7 +597,7 @@ namespace Dommel
         protected virtual object VisitExpression(Expression expression)
         {
             DynamicParameters parameters = new DynamicParameters();
-            
+
             switch (expression.NodeType)
             {
                 case ExpressionType.Lambda:
@@ -908,7 +908,14 @@ namespace Dommel
         /// </summary>
         /// <param name="expression">The constant expression.</param>
         /// <returns>The result of the processing.</returns>
-        protected virtual object VisitConstantExpression(ConstantExpression expression) => expression.Value;
+        protected virtual object VisitConstantExpression(ConstantExpression expression) 
+        {
+            if (expression.Value is bool == true)
+            {
+                return "1 = 1";
+            }
+            return expression.Value;
+        }
 
         /// <summary>
         /// Proccesses a member expression.
