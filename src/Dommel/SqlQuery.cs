@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace Dommel
 {
     public class SqlQuery<TEntityType> :
-       SqlQuery
+       SqlQueryBase
        where TEntityType : class
     {
         public SqlQuery(Dommel.ISqlBuilder sqlBuilder, string? alias = null, dynamic? parameters = null)
@@ -115,7 +115,7 @@ namespace Dommel
         }
     }
 
-    public class SqlQuery
+    public class SqlQueryBase
     {
         protected List<string> _splitOn;
         protected List<Type> _types;
@@ -126,7 +126,7 @@ namespace Dommel
         protected Dapper.SqlBuilder.Template QueryTemplate { get; set; }
         private int _parameterIndex;
 
-        public SqlQuery(Dommel.ISqlBuilder sqlBuilder, string from, dynamic? parameters = null)
+        public SqlQueryBase(Dommel.ISqlBuilder sqlBuilder, string from, dynamic? parameters = null)
         {
             _splitOn = new List<string>();
             _types = new List<Type>();
@@ -167,7 +167,7 @@ namespace Dommel
         /// </example>
         /// <param name="where">An array of WHERE clauses.</param>
         /// <returns>The query builder.</returns>
-        public SqlQuery AndWhere(string where, dynamic? parameters = null)
+        public SqlQueryBase AndWhere(string where, dynamic? parameters = null)
         {
             Parameters.AddDynamicParams(parameters);
             SqlBuilder.Where(where);
@@ -367,7 +367,7 @@ namespace Dommel
         /// <param name="join">The INNER JOIN clause.</param>
         /// <param name="parameters">Parameters included in the statement.</param>
         /// <returns>The query builder.</returns>
-        public SqlQuery InnerJoin<TEntity>(string? join = null, dynamic? parameters = null)
+        public SqlQueryBase InnerJoin<TEntity>(string? join = null, dynamic? parameters = null)
         {
             // RemoveSingleTableQueryItems();
             var type = typeof(TEntity);
@@ -432,7 +432,7 @@ namespace Dommel
         /// <param name="join">The LEFT JOIN clause.</param>
         /// <param name="parameters">Parameters included in the statement.</param>
         /// <returns>The query builder.</returns>
-        public SqlQuery LeftJoin<TEntity>(string? join = null, dynamic? parameters = null)
+        public SqlQueryBase LeftJoin<TEntity>(string? join = null, dynamic? parameters = null)
         {
             // RemoveSingleTableQueryItems();
             var type = typeof(TEntity);
@@ -475,7 +475,7 @@ namespace Dommel
         /// <param name="orderBy">One or more GROUP BY clauses.</param>
         /// <param name="parameters">Parameters included in the statement.</param>
         /// <returns>The query builder.</returns>
-        public SqlQuery OrderBy(string orderBy, dynamic parameters = null)
+        public SqlQueryBase OrderBy(string orderBy, dynamic parameters = null)
         {
             Parameters.AddDynamicParams(parameters);
             SqlBuilder.OrderBy(orderBy);
@@ -491,14 +491,14 @@ namespace Dommel
         /// <param name="where">An array of WHERE clauses.</param>
         /// <param name="parameters">Parameters included in the statement.</param>
         /// <returns>The query builder.</returns>
-        public SqlQuery OrWhere(string where, dynamic? parameters = null)
+        public SqlQueryBase OrWhere(string where, dynamic? parameters = null)
         {
             Parameters.AddDynamicParams(parameters);
             SqlBuilder.OrWhere(where);
             return this;
         }
 
-        public SqlQuery Select(string select, dynamic? parameters = null)
+        public virtual SqlQueryBase Select(string select, dynamic? parameters = null)
         {
             SqlBuilder.Select(select, parameters);
             return this;
@@ -511,7 +511,7 @@ namespace Dommel
         /// <param name="columnName">The name of the column to map into a different type.</param>
         /// <see cref="http://dapper-tutorial.net/result-multi-mapping" />
         /// <returns>The query builder.</returns>
-        public SqlQuery SplitOn<TEntityType>(string columnName)
+        public SqlQueryBase SplitOn<TEntityType>(string columnName)
         {
             return SplitOn(columnName, typeof(TEntityType));
         }
@@ -523,7 +523,7 @@ namespace Dommel
         /// <param name="entityType">The type to map data into.</param>
         /// <see cref="http://dapper-tutorial.net/result-multi-mapping" />
         /// <returns>The query builder.</returns>
-        public SqlQuery SplitOn(string columnName, Type entityType)
+        public SqlQueryBase SplitOn(string columnName, Type entityType)
         {
             // RemoveSingleTableQueryItems();
             var column = Resolvers.Column(entityType.GetProperty(columnName), DommelSqlBuilder);
@@ -571,7 +571,7 @@ namespace Dommel
         /// </summary>
         /// <param name="where">The WHERE clause.</param>
         /// <param name="parameters">Parameters included in the statement.</param>
-        public SqlQuery Where(string where, dynamic parameters = null)
+        public SqlQueryBase Where(string where, dynamic parameters = null)
         {
             return AndWhere(where, parameters);
         }
