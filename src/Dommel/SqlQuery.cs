@@ -102,7 +102,12 @@ namespace Dommel
         /// <returns></returns>
         public virtual SqlQuery<TEntityType> Where(Expression whereExpression)
         {
-            SqlBuilder.Where(VisitExpression(whereExpression).ToString());
+            var result = VisitExpression(whereExpression).ToString();
+            if (result.Equals("true", StringComparison.OrdinalIgnoreCase))
+            {
+                result = "1 = 1";
+            }
+            SqlBuilder.Where(result);
             return this;
         }
 
@@ -795,6 +800,14 @@ namespace Dommel
                 {
                     left = $"{VisitMemberAccess(leftMember)} = '1'";
                 }
+                else if (expression.Left is ConstantExpression leftConstant && leftConstant.Value is bool trueValue && trueValue == true)
+                {
+                    left = "1 = 1";
+                }
+                else if (expression.Left is ConstantExpression rightConstant && rightConstant.Value is bool falseValue && falseValue == false)
+                {
+                    left = "0 = 1";
+                }
                 else
                 {
                     left = VisitExpression(expression.Left);
@@ -910,10 +923,6 @@ namespace Dommel
         /// <returns>The result of the processing.</returns>
         protected virtual object VisitConstantExpression(ConstantExpression expression) 
         {
-            if (expression.Value is bool == true)
-            {
-                return "1 = 1";
-            }
             return expression.Value;
         }
 

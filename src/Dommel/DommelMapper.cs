@@ -24,6 +24,7 @@ namespace Dommel
         internal static IForeignKeyPropertyResolver ForeignKeyPropertyResolver = new DefaultForeignKeyPropertyResolver();
         internal static ITableNameResolver TableNameResolver = new DefaultTableNameResolver();
         internal static IColumnNameResolver ColumnNameResolver = new DefaultColumnNameResolver();
+        internal static ISqlBuilder SqlBuilderResolver = new SqlServerSqlBuilder();
 
         internal static readonly Dictionary<string, ISqlBuilder> SqlBuilders = new Dictionary<string, ISqlBuilder>
         {
@@ -95,6 +96,12 @@ namespace Dommel
         /// </summary>
         /// <param name="resolver">An instance of <see cref="IColumnNameResolver"/>.</param>
         public static void SetColumnNameResolver(IColumnNameResolver resolver) => ColumnNameResolver = resolver;
+
+        /// <summary>
+        /// Set the SqlBuilder for use in name resolving
+        /// </summary>
+        /// <param name="sqlBuilder"></param>
+        public static void SetSqlBuilderResolver(ISqlBuilder sqlBuilder) => SqlBuilderResolver = sqlBuilder;
 
         /// <summary>
         /// Adds a custom implementation of <see cref="ISqlBuilder"/>

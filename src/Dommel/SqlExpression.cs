@@ -458,6 +458,14 @@ namespace Dommel
                 {
                     left = $"{VisitMemberAccess(leftMember)} = '1'";
                 }
+                else if (expression.Left is ConstantExpression leftConstant && leftConstant.Value is bool trueValue && trueValue == true)
+                {
+                    left = "1 = 1";
+                }
+                else if (expression.Left is ConstantExpression rightConstant && rightConstant.Value is bool falseValue && falseValue == false)
+                {
+                    left = "0 = 1";
+                }
                 else
                 {
                     left = VisitExpression(expression.Left);

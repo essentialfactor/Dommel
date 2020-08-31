@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Dapper;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Reflection;
 
 namespace Dommel
@@ -151,6 +153,18 @@ namespace Dommel
 
             DommelMapper.LogReceived?.Invoke($"Resolved column name '{columnName}' for '{propertyInfo}'");
             return columnName;
+        }
+
+        /// <summary>
+        /// Uses sqlserversqlbuilder right now.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="propertyName"></param>
+        /// <returns></returns>
+        public static string Column(Type type, string propertyName)
+        {
+            var propertyInfo = type.GetProperty(propertyName);
+            return Column(propertyInfo, DommelMapper.SqlBuilderResolver);
         }
 
         private struct ForeignKeyInfo
