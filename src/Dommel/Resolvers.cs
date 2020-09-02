@@ -156,7 +156,7 @@ namespace Dommel
         }
 
         /// <summary>
-        /// Uses sqlserversqlbuilder right now.
+        /// Uses DommelMapper.SqlBuilderResolver right now.
         /// </summary>
         /// <param name="type"></param>
         /// <param name="propertyName"></param>
@@ -165,6 +165,16 @@ namespace Dommel
         {
             var propertyInfo = type.GetProperty(propertyName);
             return Column(propertyInfo, DommelMapper.SqlBuilderResolver);
+        }
+
+        /// <summary>
+        /// Users DommelMapper.SqlBuilderResolver
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static string Table(Type type)
+        {
+            return Table(type, DommelMapper.SqlBuilderResolver);
         }
 
         private struct ForeignKeyInfo

@@ -36,6 +36,23 @@ namespace Dommel
             return this;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TRelated"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        public SqlQuery<TEntityType> LeftJoin<TRelated>(Expression<Func<TEntityType, TRelated, bool>>? expression = null)
+        {
+            var type = typeof(TRelated);
+            _types.Add(type);
+
+            var onSql = expression == null ? VisitExpression(ComputeJoinOnStatement(type)) : VisitExpression(expression).ToString();
+            SqlBuilder.LeftJoin($"{Dommel.Resolvers.Table(type, DommelSqlBuilder)} ON {onSql}");
+
+            return this;
+        }
+
         public virtual SqlQuery<TEntityType> Select<TEntity>(IEnumerable<string> propertyNames)
         {
             var type = typeof(TEntity);
@@ -84,6 +101,8 @@ namespace Dommel
 
             return this;
         }
+
+
 
         public virtual SqlQuery<TEntityType> Where<TEntity>(Expression<Func<TEntity, bool>> whereExpression)
         {
