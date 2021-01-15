@@ -104,12 +104,12 @@ namespace Dommel
 
 
 
-        public virtual SqlQuery<TEntityType> Where<TEntity>(Expression<Func<TEntity, bool>> whereExpression)
+        public virtual SqlQuery<TEntityType> Where<TEntity>(Expression<Func<TEntity, bool>>? whereExpression = null)
         {
             return Where(whereExpression as Expression);
         }
 
-        public virtual SqlQuery<TEntityType> Where(Expression<Func<TEntityType, bool>> whereExpression)
+        public virtual SqlQuery<TEntityType> Where(Expression<Func<TEntityType, bool>>? whereExpression = null)
         {
             return Where(whereExpression as Expression);
         }
@@ -119,14 +119,17 @@ namespace Dommel
         /// </summary>
         /// <param name="whereExpression"></param>
         /// <returns></returns>
-        public virtual SqlQuery<TEntityType> Where(Expression whereExpression)
+        public virtual SqlQuery<TEntityType> Where(Expression? whereExpression)
         {
-            var result = VisitExpression(whereExpression).ToString();
-            if (result.Equals("true", StringComparison.OrdinalIgnoreCase))
+            if (!(whereExpression is null))
             {
-                result = "1 = 1";
+                var result = VisitExpression(whereExpression).ToString();
+                if (result.Equals("true", StringComparison.OrdinalIgnoreCase))
+                {
+                    result = "1 = 1";
+                }
+                SqlBuilder.Where(result);
             }
-            SqlBuilder.Where(result);
             return this;
         }
 
@@ -622,7 +625,7 @@ namespace Dommel
         {
             DynamicParameters parameters = new DynamicParameters();
 
-            switch (expression.NodeType)
+            switch (expression?.NodeType)
             {
                 case ExpressionType.Lambda:
                     return VisitLambda((LambdaExpression)expression);

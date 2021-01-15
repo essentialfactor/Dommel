@@ -90,6 +90,18 @@ namespace Dommel.Tests
         }
 
         [Fact]
+        public void HandleNullWhere()
+        {
+            Expression<Func<Product, bool>>? condition = null;
+            var sql = _sqlQuery
+                .Where(condition)
+                .Select("*")
+                .ToSql(out var parameters);
+
+            AssertQueryMatches("SELECT * FROM [Products]", sql);
+        }
+
+        [Fact]
         public void TranslateWhereClauseForJoined()
         {
             var translateTime = Stopwatch.StartNew();
