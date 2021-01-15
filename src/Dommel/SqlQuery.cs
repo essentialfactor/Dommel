@@ -94,7 +94,12 @@ namespace Dommel
             {
                 throw new ArgumentException($"Projection over type '{typeof(TEntity).Name}' yielded no properties.", nameof(selector));
             }
-            var allProperties = Resolvers.Properties(type).Select(x => x.Property.Name);
+            //var allProperties = Resolvers.Properties(type).Where(x => x.Property.SetMethod).Select(x => x.Property.Name);
+            var allProperties = Resolvers.Properties(type)
+                     .Where(x => !x.IsGenerated)
+                     .Select(x => x.Property)
+                     .Where(p => p.GetSetMethod() != null)
+                     .Select(p => p.Name);
             var columns = props.Where(x => allProperties.Contains(x.Name, StringComparer.OrdinalIgnoreCase)).Select(p => $"{Dommel.Resolvers.Table(type, DommelSqlBuilder)}.{Dommel.Resolvers.Column(p, DommelSqlBuilder)}");
 
             SqlBuilder.Select(string.Join(", ", columns));

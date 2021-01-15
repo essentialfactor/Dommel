@@ -86,6 +86,8 @@ namespace Dommel.Tests
 
         // One Product has many Options
         public List<ProductOption>? Options { get; set; }
+
+        public int GetOnlyProperty => 1;
     }
 
     public class Category

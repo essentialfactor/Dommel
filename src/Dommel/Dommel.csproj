@@ -17,9 +17,9 @@
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>embedded</DebugType>
-    <Version>2.1-beta15</Version>
-    <AssemblyVersion>2.1.0.15</AssemblyVersion>
-    <FileVersion>2.1.0.15</FileVersion>
+    <Version>2.1-beta16</Version>
+    <AssemblyVersion>2.1.0.16</AssemblyVersion>
+    <FileVersion>2.1.0.16</FileVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.0.35" />
