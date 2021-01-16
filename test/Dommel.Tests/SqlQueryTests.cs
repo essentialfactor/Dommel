@@ -41,6 +41,18 @@ namespace Dommel.Tests
         }
 
         [Fact]
+        public void JoinOnPartiallyNullable()
+        {
+            // If the left side is nullable and the right side is not then it isn't putting the column based join but a value one.
+            var sql = _sqlQuery
+                .Select<Product>(new List<string> { nameof(Product.Id) })
+                .InnerJoin<Category>((p, c) => p.NullableCategoryId == c.Id)
+                .ToSql(out var parameters);
+
+            AssertQueryMatches("SELECT [Products].[Id] FROM [Products] INNER JOIN [Categories] ON [Products].[NullableCategoryId] = [Categories].[Id]", sql);
+        }
+
+        [Fact]
         public void CreateDefaultJoin()
         {
             var sql = _sqlQuery
@@ -161,7 +173,7 @@ namespace Dommel.Tests
                           .Select<Product>(p => p)
                           .ToSql();
 
-            AssertQueryMatches("SELECT [Products].[Id], [Products].[Name], [Products].[CategoryId] FROM [Products]", sql);
+            AssertQueryMatches("SELECT [Products].[Id], [Products].[Name], [Products].[CategoryId], [Products].[NullableCategoryId] FROM [Products]", sql);
         }
 
         // split on and keep the columns in the same order as the entities.

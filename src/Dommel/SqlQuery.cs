@@ -872,6 +872,11 @@ namespace Dommel
                 {
                     return $"{left} {operand} {right}";
                 }
+                if (expression.Right is UnaryExpression unary && unary.Operand is MemberExpression unaryMember && unaryMember.Expression?.NodeType == ExpressionType.Parameter)
+                {
+                    return $"{left} {operand} {right}";
+                }
+
                 AddParameter(right, out var paramName);
                 return $"{left} {operand} {paramName}";
             }

@@ -88,6 +88,8 @@ namespace Dommel.Tests
         public List<ProductOption>? Options { get; set; }
 
         public int GetOnlyProperty => 1;
+
+        public int? NullableCategoryId { get; set; }
     }
 
     public class Category
