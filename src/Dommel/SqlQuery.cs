@@ -141,9 +141,14 @@ namespace Dommel
         private void AddColumn(Type type, string propertyName)
         {
             var propertyMaps = Dommel.Resolvers.Properties(type);
-            var propertyInfo = propertyMaps.First(x => x.Property.Name.Equals(propertyName, StringComparison.OrdinalIgnoreCase)).Property;
+            var propertyInfo = propertyMaps.FirstOrDefault(x => x.Property.Name.Equals(propertyName, StringComparison.OrdinalIgnoreCase))?.Property;
 
-            SqlBuilder.Select($"{Dommel.Resolvers.Table(type, DommelSqlBuilder)}.{Dommel.Resolvers.Column(propertyInfo, DommelSqlBuilder)}");
+            if (propertyInfo != null)
+            {
+                SqlBuilder.Select($"{Dommel.Resolvers.Table(type, DommelSqlBuilder)}.{Dommel.Resolvers.Column(propertyInfo, DommelSqlBuilder)}");
+            }
+
+            // With GraphQL could pass more fields than are on the base type (related fields), so just ignoring
         }
     }
 

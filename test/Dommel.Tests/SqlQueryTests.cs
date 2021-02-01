@@ -114,6 +114,18 @@ namespace Dommel.Tests
         }
 
         [Fact]
+        public void TranslateIgnoreExtra()
+        {
+            var translateTime = Stopwatch.StartNew();
+            var sql = _sqlQuery
+              .Select<Product>(new List<string>{ "id", "nAme", "fluff" })
+              .ToSql(out var parameters);
+            translateTime.Stop();
+            
+            AssertQueryMatches("SELECT [Products].[Id], [Products].[Name] FROM [Products]", sql);
+        }
+
+        [Fact]
         public void TranslateWhereClauseForJoined()
         {
             var translateTime = Stopwatch.StartNew();
