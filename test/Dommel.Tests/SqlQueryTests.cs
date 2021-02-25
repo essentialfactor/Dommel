@@ -98,7 +98,7 @@ namespace Dommel.Tests
             Assert.Single(parameters.ParameterNames);
             Assert.Equal("p1", param);
             Assert.Equal("Test", parameters.Get<string>(param));
-            AssertQueryMatches("SELECT [Products].[Id], [Products].[Name] FROM [Products] WHERE 1 = 1 and [Products].[Name] = @p1", sql);
+            AssertQueryMatches("SELECT [Products].[Id], [Products].[Name] FROM [Products] WHERE 1 = 1 and ([Products].[Name] = @p1)", sql);
         }
 
         [Fact]
@@ -165,7 +165,7 @@ namespace Dommel.Tests
             Assert.Equal("Test", parameters.Get<string>(param));
             Assert.Equal("p2", second);
             Assert.Equal(5, parameters.Get<int>(second));
-            AssertQueryMatches("SELECT [Products].[Id], [Products].[Name] FROM [Products] INNER JOIN [Categories] ON [Products].[CategoryId] = [Categories].[Id] WHERE [Products].[Name] = @p1 AND [Categories].[Id] = @p2", sql);
+            AssertQueryMatches("SELECT [Products].[Id], [Products].[Name] FROM [Products] INNER JOIN [Categories] ON [Products].[CategoryId] = [Categories].[Id] WHERE ([Products].[Name] = @p1) AND ([Categories].[Id] = @p2)", sql);
         }
 
         [Fact]
@@ -186,6 +186,18 @@ namespace Dommel.Tests
                           .ToSql();
 
             AssertQueryMatches("SELECT [Products].[Id], [Products].[Name], [Products].[CategoryId], [Products].[NullableCategoryId] FROM [Products]", sql);
+        }
+
+        [Fact]
+        public void TranslateParentheses()
+        {
+            var sql = _sqlQuery
+              .InnerJoin<Category>((p, c) => p.CategoryId == c.Id)
+              .Select<Product>(p => new { p.Id, p.Name })
+              .Where(x => x.CategoryId == 3 && (x.Name == "Test" || x.Name == "Test2"))
+              .ToSql(out var parameters);
+            
+            AssertQueryMatches("SELECT [Products].[Id], [Products].[Name] FROM [Products] INNER JOIN [Categories] ON [Products].[CategoryId] = [Categories].[Id] WHERE ([Products].[CategoryId] = @p1) AND (([Products].[Name] = @p2) OR ([Products].[Name] = @p3))", sql);
         }
 
         // split on and keep the columns in the same order as the entities.
