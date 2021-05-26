@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.SqlServer.Types;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -200,6 +201,24 @@ namespace Dommel.Tests
             AssertQueryMatches("SELECT [Products].[Id], [Products].[Name] FROM [Products] INNER JOIN [Categories] ON [Products].[CategoryId] = [Categories].[Id] WHERE ([Products].[CategoryId] = @p1) AND (([Products].[Name] = @p2) OR ([Products].[Name] = @p3))", sql);
         }
 
+        [Fact]
+        public void STEquals()
+        {
+            var resolver = new ShapePropertyResolver();
+
+            Dommel.DommelMapper.SetPropertyResolver(resolver);
+
+            var shape = SqlGeography.Point(-90, 90, 4326);
+
+            var sql = new SqlQuery<WithShape>(new SqlServerSqlBuilder())
+                .Select<WithShape>(s => new { s.Id })
+                .Where(x => x.Shape == shape)
+                .ToSql();
+
+            AssertQueryMatches("SELECT [WithShapes].[Id] FROM [WithShapes] WHERE @p1.STEquals([WithShapes].[Shape]) = 1", sql);
+
+        }
+
         // split on and keep the columns in the same order as the entities.
 
         private void AssertQueryMatches(string expected, string actual)
@@ -209,5 +228,9 @@ namespace Dommel.Tests
             Assert.Equal(expected, removeLineBreaks.Trim(), ignoreWhiteSpaceDifferences: true, ignoreCase: true);
         }
     }
-
+    public class WithShape
+    {
+        public int Id { get; set; }
+        public SqlGeography? Shape { get; set; }
+    }
 }

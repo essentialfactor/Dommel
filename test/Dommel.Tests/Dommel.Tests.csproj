@@ -8,6 +8,8 @@
     <PackageReference Include="coverlet.msbuild" Version="2.9.0" PrivateAssets="All">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.SqlServer.Types" Version="14.0.1016.290" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
     <ProjectReference Include="..\..\src\Dommel\Dommel.csproj" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.6.1" />
     <PackageReference Include="xunit" Version="2.4.1" />

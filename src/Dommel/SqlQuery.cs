@@ -854,6 +854,14 @@ namespace Dommel
                     right = $"({VisitExpression(expression.Right)})";
                 }
             }
+            else if (operand == "=" && (expression.Left.Type.Name == "SqlGeography" || expression.Left.Type.Name == "SqlGeometry"))
+            {
+                // So this is geography
+                right = VisitExpression(expression.Right); 
+                AddParameter(right, out var paramName);
+                // Dapper handles the parameter so we just need to know to use the STEquals
+                return $"{paramName}.STEquals({VisitExpression(expression.Left)}) = 1";
+            }
             else
             {
                 // It's a single expression, e.g. Foo == 42
